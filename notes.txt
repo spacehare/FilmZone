@@ -1,0 +1,13 @@
+https://developers.google.com/sheets/api/quickstart/python
+https://discordpy.readthedocs.io/en/stable/index.html#getting-started
+
+https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa discord unix epoch timestamps
+https://discord.com/developers/docs/reference#message-formatting-timestamp-styles
+
+
+https://discord.com/developers/docs/reference
+https://discord.com/developers/docs/reference#message-formatting
+spoiler ||text||
+@ <@id>		or		.mention
+
+python 3.11.1
