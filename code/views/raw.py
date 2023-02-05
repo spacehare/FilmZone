@@ -3,6 +3,19 @@ from discord.ext import commands
 from deserialize import TFFZ
 
 
+class RerollView(discord.ui.View):
+    def __init__(self, guy: discord.Member, bot: commands.Bot):
+        self.guy = guy
+        self.bot = bot
+        super().__init__()
+
+    @discord.ui.button(label="add", style=discord.ButtonStyle.success, emoji="🍀")
+    async def apply_reroll_guy(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await self.guy.add_roles(TFFZ(self.bot).role)
+        button.disabled = True
+        await interaction.response.defer()
+
+
 class RawView(discord.ui.View):
     def __init__(self, data, bot: commands.Bot):
         self.data = data
@@ -31,7 +44,7 @@ class RawView(discord.ui.View):
         # button.disabled = True
         # self.stop()
 
-    @discord.ui.button(label="rm", style=discord.ButtonStyle.danger, emoji="🍀")
+    @discord.ui.button(label="rm", style=discord.ButtonStyle.danger, emoji="✂")
     async def remove_lucky_ones(self, interaction: discord.Interaction, button: discord.ui.Button):
         for member in self.role.members:
             print('removing', str(member))

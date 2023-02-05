@@ -7,7 +7,7 @@ from deserialize import TFFZ
 # from typing import Dict, List
 from pprint import pformat
 from json import dump, load
-from views.raw import RawView
+from views.raw import RawView, RerollView
 from os.path import getmtime
 from random import choice
 
@@ -52,10 +52,18 @@ class FilmZoneModule(commands.Cog):
     #     else:
     #         await ctx.send('No data.')
 
+    @commands.command()
+    async def addrem(self, ctx: commands.Context, member: discord.Member):
+        await member.remove_roles(TFFZ(self.bot).role) if TFFZ(
+            self.bot).role in member.roles else await member.add_roles(TFFZ(self.bot).role)
+        # await ctx.defer()
+
     @commands.command(aliases=['rr'])
     async def reroll(self, ctx: commands.Context):
         c = choice(self.raw_data['mane_list'])
-        await ctx.send(f"{self.format_film(c['film'], c['year'])} — {c['freak']}")
+        view = RerollView(
+            await TFFZ(self.bot).guild.fetch_member(c['uid']), self.bot)
+        await ctx.send(f"{self.format_film(c['film'], c['year'])} — {c['freak']}", view=view)
 
     @commands.command()
     async def raw(self, ctx: commands.Context):
