@@ -54,12 +54,14 @@ class FilmZoneModule(commands.Cog):
 
     @commands.command()
     async def addrem(self, ctx: commands.Context, member: discord.Member):
+        """toggle adding or removing a member from lucky ones"""
         await member.remove_roles(TFFZ(self.bot).role) if TFFZ(
             self.bot).role in member.roles else await member.add_roles(TFFZ(self.bot).role)
         # await ctx.defer()
 
     @commands.command(aliases=['rr'])
     async def reroll(self, ctx: commands.Context):
+        """reroll a pick/choice"""
         c = choice(self.raw_data['mane_list'])
         view = RerollView(
             await TFFZ(self.bot).guild.fetch_member(c['uid']), self.bot)
@@ -80,8 +82,8 @@ class FilmZoneModule(commands.Cog):
             self.raw_data = load(file)
         await ctx.send(f'Loaded {datetime.utcfromtimestamp(getmtime(TEMP_DATA_PATH))} utc')
 
-    @commands.command()
-    async def fz(self, ctx: commands.Context) -> None:
+    @commands.command(aliases=['fz'])
+    async def roll(self, ctx: commands.Context) -> None:
         """Grabs 6 picks, lucky ones. Stores in .temp/ as json."""
         self.raw_data = gsheet()  # grab random movies
         if not ctx.interaction:
@@ -91,7 +93,6 @@ class FilmZoneModule(commands.Cog):
             with open(TEMP_DATA_PATH, 'w') as file:
                 dump(self.raw_data, file)
             view = RawView(self.raw_data, self.bot)
-            await ctx.send(view=view)
             # view.apply_lucky_ones.disabled = True
             guild = TFFZ(self.bot).guild
             lucky_ones = [await guild.fetch_member(
@@ -102,11 +103,11 @@ class FilmZoneModule(commands.Cog):
             # pick['film'] for pick in self.raw_data['picks']
             # "\n".join(str(member) for member in lucky_ones)
 
-            await ctx.reply(f"today: {today.strftime('%A, %B %e')}\n"
-                            + f"in 4 days: {later_dates.strftime('%A, %B %e')}\n\n"
-                            + "\n".join(f"{idx+1}. {self.format_film(pick['film'], pick['year'])} — {pick['freak']}"
-                                        for idx, pick in enumerate(self.raw_data['picks']))
-                            )
+            await ctx.send(f"today: {today.strftime('%A, %B %e')}\n"
+                           + f"in 4 days: {later_dates.strftime('%A, %B %e')}\n\n"
+                           + "\n".join(f"{idx+1}. {self.format_film(pick['film'], pick['year'])} — {pick['freak']}"
+                                       for idx, pick in enumerate(self.raw_data['picks'])), view=view
+                           )
             # await view.wait()
         else:
             await ctx.send('No data.')
