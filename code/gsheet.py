@@ -70,6 +70,9 @@ def gsheet():  # -> Dict[str, List[int]] | None
                                        range=indirect).execute().get('values', [])
             # https://stackoverflow.com/questions/952914/how-do-i-make-a-flat-list-out-of-a-list-of-lists
             # films = [item for sublist in films for item in sublist]  # flatten
+
+            # if someone has a blank movie, remove it
+            films = [film for film in films if film]
             mane_list += [{'uid': uid, 'freak': freak, 'film': film[0], 'year': film[1] if len(film) > 1 else None}
                           for film in films]
 
