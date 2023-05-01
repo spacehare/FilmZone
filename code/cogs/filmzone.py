@@ -117,9 +117,16 @@ class FilmZoneModule(commands.Cog):
         await ctx.send(self.spoildisplay())
 
     def spoildisplay(self):
-        rv = ''  # [pick['film'] for pick in self.raw_data['picks']]
-        for pick in self.raw_data['picks']:
-            rv += f'||{pick["film"]}|| — {pick["freak"]}\n'
+        rv = '```'  # [pick['film'] for pick in self.raw_data['picks']]
+        rv += 'These are the movies for this week:\n'
+        for idx, pick in enumerate(self.raw_data['picks']):
+            if idx != 5:
+                rv += f'{idx+1}. ||' + \
+                    self.format_film(
+                        pick["film"], pick["year"]) + '||' + f' — {pick["freak"]}\n'
+            else:
+                rv += f'\nand the random pick is ||{self.format_film(pick["film"], pick["year"])}|| — {pick["freak"]}'
+        rv += '```'
         return rv
 
     def format_film(self, film: str, year: str):
