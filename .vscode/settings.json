@@ -2,5 +2,9 @@
 	"python.analysis.typeCheckingMode": "off",
 	// "python.terminal.activateEnvironment": true,
 	"python.terminal.activateEnvInCurrentTerminal": true,
-	"python.defaultInterpreterPath": "environment/Scripts/python.exe"
+	"python.defaultInterpreterPath": "environment/Scripts/python.exe",
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.autopep8"
+	},
+	"python.formatting.provider": "none"
 }
