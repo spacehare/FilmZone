@@ -1,15 +1,16 @@
 import discord
 from random import randint
 from datetime import date, datetime, timedelta
+from time import time, mktime, strptime
 from discord.ext import commands
 from gsheet import gsheet
-from deserialize import TFFZ
-# from typing import Dict, List
 from pprint import pformat
 from json import dump, load
-from views.raw import RawView, RerollView
 from os.path import getmtime
 from random import choice
+
+from deserialize import TFFZ
+from views.raw import RawView, RerollView
 
 TEMP_DATA_PATH = r'.temp/gsheet.json'
 
@@ -60,11 +61,13 @@ class FilmZoneModule(commands.Cog):
         # await ctx.defer()
 
     @commands.command(aliases=['rr'])
-    async def reroll(self, ctx: commands.Context):
+    async def reroll(self, ctx: commands.Context, which: int | bool = False):
         """reroll a pick/choice"""
         c = choice(self.raw_data['mane_list'])
         view = RerollView(
             await TFFZ(self.bot).guild.fetch_member(c['uid']), self.bot)
+        if which:
+            self.raw_data['picks'][which - 1] = c
         await ctx.send(f"{self.format_film(c['film'], c['year'])} — {c['freak']}", view=view)
 
     @commands.command()
@@ -115,6 +118,23 @@ class FilmZoneModule(commands.Cog):
     @commands.command()
     async def spoil(self, ctx: commands.Context):
         await ctx.send(self.spoildisplay())
+
+    @commands.command()
+    async def poll(self, ctx: commands.Context, start: str = ''):
+        current = datetime.today()
+        tgt_date = None
+        if start:
+            v = strptime(start, '%A').tm_wday
+            tgt_date = current + \
+                timedelta(days=(v - current.weekday() + 7) % 7)
+        epoch: int = tgt_date.timestamp() if tgt_date else int(time())
+        string = '```/poll create message:When should we have our next movie night?'
+        for d in range(7):
+            day = epoch + (86400 * d)
+            string += f' choice{d+1}:{datetime.fromtimestamp(day).strftime("%A, %b %d")}'
+        string += '```'
+        await ctx.send(string)
+        pass
 
     def spoildisplay(self):
         rv = '```'  # [pick['film'] for pick in self.raw_data['picks']]
