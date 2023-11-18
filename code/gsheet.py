@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os.path
+import re
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -24,6 +25,7 @@ PATHS = {
     "token": "configuration/token.json",
     "credentials": "configuration/credentials.json",
 }
+regex_grab_cell = r'(.+)!(\w)(\d+)[:]'
 
 
 def gsheet():  # -> Dict[str, List[int]] | None
@@ -66,15 +68,22 @@ def gsheet():  # -> Dict[str, List[int]] | None
 
         # get data
         for uid, freak, indirect in values:
+            # cell_int: int = raw_cell_coord.group(3)
+            def cell_coord(index: int):
+                raw_cell_coord = re.search(regex_grab_cell, indirect)
+                sheet: str = raw_cell_coord.group(1)
+                letter: str = raw_cell_coord.group(2)
+                number: int = int(raw_cell_coord.group(3)) + index
+                return f"{sheet}!{letter}{number}"
+
             films = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
                                        range=indirect).execute().get('values', [])
-            # https://stackoverflow.com/questions/952914/how-do-i-make-a-flat-list-out-of-a-list-of-lists
-            # films = [item for sublist in films for item in sublist]  # flatten
 
             # if someone has a blank movie, remove it
             films = [film for film in films if film]
-            mane_list += [{'uid': uid, 'freak': freak, 'film': film[0], 'year': film[1] if len(film) > 1 else None}
-                          for film in films]
+
+            mane_list += [{'cell': cell_coord(idx), 'uid': uid, 'freak': freak, 'film': film[0], 'year': film[1] if len(film) > 1 else None}
+                          for idx, film in enumerate(films)]
 
         new_list = mane_list
         # roll

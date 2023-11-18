@@ -108,7 +108,7 @@ class FilmZoneModule(commands.Cog):
 
             await ctx.send(f"today: {today.strftime('%A, %B %e')}\n"
                            + f"in 4 days: {later_dates.strftime('%A, %B %e')}\n\n"
-                           + "\n".join(f"{idx+1}. {self.format_film(pick['film'], pick['year'])} — {pick['freak']}"
+                           + "\n".join(f"{idx+1}. {self.format_film(pick['film'], pick['year'])} — {pick['freak']} [{pick['cell']}] "
                                        for idx, pick in enumerate(self.raw_data['picks'])), view=view
                            )
             # await view.wait()
@@ -131,7 +131,8 @@ class FilmZoneModule(commands.Cog):
         string = '```/poll create message:When should we have our next movie night?'
         for d in range(7):
             day = epoch + (86400 * d)
-            string += f' choice{d+1}:{datetime.fromtimestamp(day).strftime("%A, %b %d")}'
+            string += f' choice{d +
+                                1}:{datetime.fromtimestamp(day).strftime("%A, %b %d")}'
         string += '```'
         await ctx.send(string)
         pass
@@ -145,7 +146,8 @@ class FilmZoneModule(commands.Cog):
                     self.format_film(
                         pick["film"], pick["year"]) + '||' + f' — {pick["freak"]}\n'
             else:
-                rv += f'\nand the random pick is ||{self.format_film(pick["film"], pick["year"])}|| — {pick["freak"]}'
+                rv += f'\nand the random pick is ||{self.format_film(
+                    pick["film"], pick["year"])}|| — {pick["freak"]}'
         rv += '```'
         return rv
 
