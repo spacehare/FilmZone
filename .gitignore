@@ -1,4 +1,4 @@
-environment
+.venv
 configuration
 __pycache__
 .temp

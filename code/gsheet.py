@@ -1,10 +1,10 @@
 from __future__ import print_function
 
-import os.path
 import re
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from oauth2client.service_account import ServiceAccountCredentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -23,31 +23,16 @@ RANGE_NAME: str = 'META!J2:L'  # discord uid, human, indirect
 ROLLS: int = 6
 PATHS = {
     "token": "configuration/token.json",
-    "credentials": "configuration/credentials.json",
+    "service": "configuration/service.json",
 }
 regex_grab_cell = r'(.+)!(\w)(\d+)[:]'
 
 
-def gsheet():  # -> Dict[str, List[int]] | None
+def gsheet():
     """Grab random picks from google sheet
     """
-    creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists(PATHS['token']):
-        creds = Credentials.from_authorized_user_file(PATHS['token'], SCOPES)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                PATHS['credentials'], SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open(PATHS['token'], 'w') as token:
-            token.write(creds.to_json())
+    creds = ServiceAccountCredentials.from_json_keyfile_name(
+        PATHS['service'], SCOPES)
 
     try:
         service = build('sheets', 'v4', credentials=creds)
