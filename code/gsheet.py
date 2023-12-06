@@ -77,7 +77,8 @@ def gsheet():
             print(pick)
             picks.append(pick)
             # remove picks (dupes) from new_list
-            new_list = [ticket for ticket in new_list if ticket != pick]
+            new_list = [
+                ticket for ticket in new_list if ticket['film'].lower() != pick['film'].lower()]
 
         lucky_ones = list(set([pick['uid'] for pick in picks]))
 
